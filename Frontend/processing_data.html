@@ -1,0 +1,665 @@
+
+                <!DOCTYPE html>
+                <html lang="zh">
+                <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>数据处理中</title>
+                  <style>
+                    *,
+                    *::before,
+                    *::after {
+                      box-sizing: border-box;
+                      margin: 0;
+                    }
+                    .iframe-outer {
+                      position: fixed;
+                      top: 0;
+                      left: 0;
+                      bottom: 0;
+                      right: 0;
+                      display: flex;
+                      justify-content: center;
+                      background-color: #E0E0E0;
+                    }
+                    .iframe-wrapper {
+                      width: 100%;
+                      height: 100%;
+                      margin: 0 auto;
+                      transform-origin: center top;
+                      flex-shrink: 0;
+                    }
+                    #dynamicIframe {
+                      border: none;
+                      width: 100%;
+                      height: 100%;
+                    }
+                  </style>
+                  <script>
+                const width = 1920
+                const height = 1080
+                const resolutionRatio = width && height ? width / height : 1
+                const pageNameMap = {
+                  'home': '首页',
+    'questionnaire_multi_step': 'ADHD问卷',
+    'file_upload': '文件上传',
+    'processing_data': '数据处理中',
+    'diagnostic_results': '诊断结果'
+                }
+                function setIframeSize(w, h) {
+                  const currentContainerRadio = w / h
+                  let widthValue = w
+                  let heightValue = h
+                  let zoom = 1
+                  if (currentContainerRadio > resolutionRatio) {
+                    widthValue = h * resolutionRatio
+                    heightValue = h
+                  } else {
+                    widthValue = w
+                    heightValue = w / resolutionRatio
+                  }
+                  zoom = width ? widthValue / width : 1
+                  return {
+                    width: widthValue / zoom + 'px',
+                    height: heightValue / zoom + 'px',
+                    zoom,
+                  }
+                }
+                function adjustIframeSize() {
+                  const iframeWrapper = document.querySelector(".iframe-wrapper")
+                  const { width, height, zoom } = setIframeSize(window.innerWidth, window.innerHeight)
+                  iframeWrapper.style.height = height
+                  iframeWrapper.style.width = width
+                  iframeWrapper.style.transform = 'scale(' + zoom + ')'
+                }
+                function sanitizeFilename(name) {
+                  return name.replace(/[\/:*?"<>|]/g, '_')
+                }
+                function handlePostMessage(event) {
+                  if (!event.data) {
+                    return
+                  }
+                  const { type, targetPageId } = event.data
+                  const targetPageName = pageNameMap[targetPageId]
+                  if (type === "iframeNavigation" && targetPageId && targetPageName) {
+                    window.location.href = targetPageName + '.html'
+                  }
+                }
+                window.addEventListener('message', handlePostMessage)
+                window.onload = adjustIframeSize
+                window.onresize = adjustIframeSize
+                window.onunload = () => {
+                  window.removeEventListener('message', handlePostMessage)
+                }
+              </script>
+                </head>
+                <body>
+                  <div class="iframe-outer">
+                    <div class="iframe-wrapper">
+                      <iframe id="dynamicIframe" srcdoc='<html lang="简体中文" data-theme="corporate"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据处理中</title>
+<link href="./assets/static/uxbot/daisyui@5.css" rel="stylesheet" type="text/css">
+<script src="./assets/static/uxbot/tailwind-browser@4.js"></script>
+<link href="./assets/static/uxbot/daisyui-themes.css" rel="stylesheet" type="text/css">
+<script src="./assets/3/3.1.1/iconify.min.js"></script>
+<style>
+/* Import Google Fonts */
+@import url(&#39;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Source+Sans+Pro:wght@400;600;700&amp;display=swap&#39;);
+
+/* daisyUI Theme Variables Customization
+ * Based on the "corporate" theme for professional medical application
+ */
+:root {
+    /* Brand Colors - Professional Medical Theme */
+    --color-primary: rgba(31, 41, 64, 1);        /* Deep Navy for trust and professionalism */
+    --color-primary-content: rgba(255, 255, 255, 1);
+    --color-secondary: rgba(52, 73, 94, 1);      /* Charcoal for secondary elements */
+    --color-secondary-content: rgba(255, 255, 255, 1);
+    --color-accent: rgba(41, 128, 185, 1);       /* Professional blue for highlights */
+    --color-accent-content: rgba(255, 255, 255, 1);
+    
+    /* Background Colors - Clean Medical Aesthetic */
+    --color-base-100: rgba(249, 249, 249, 1);    /* Off-white background */
+    --color-base-200: rgba(242, 242, 242, 1);    /* Slightly darker for sections */
+    --color-base-300: rgba(226, 226, 226, 1);    /* Light grey for borders */
+    --color-base-content: rgba(31, 41, 64, 1);   /* Deep Navy for text */
+    
+    /* Semantic colors for medical context */
+    --color-success: rgba(39, 174, 96, 1);       /* Professional green */
+    --color-success-content: rgba(255, 255, 255, 1);
+    --color-error: rgba(231, 76, 60, 1);         /* Calm red for errors */
+    --color-error-content: rgba(255, 255, 255, 1);
+    --color-warning: rgba(243, 156, 18, 1);      /* Amber for warnings */
+    --color-warning-content: rgba(31, 41, 64, 1);
+    --color-info: rgba(52, 152, 219, 1);         /* Info blue */
+    --color-info-content: rgba(255, 255, 255, 1);
+    
+    /* Border radius and effects - Modern yet structured */
+    --radius-box: 0.5rem;   /* 8px for cards and containers */
+    --radius-field: 0.5rem; /* 8px for form elements */
+    --radius-selector: 0.5rem; /* 8px for buttons and selectors */
+    --border: 1px;
+}
+
+/* Typography - Professional and readable */
+.font-heading {
+    font-family: &#39;Source Sans Pro&#39;, sans-serif;
+}
+
+.font-body {
+    font-family: &#39;Inter&#39;, sans-serif;
+}
+
+/* Apply fonts globally */
+h1, h2, h3, h4, h5, h6 {
+    font-family: &#39;Source Sans Pro&#39;, sans-serif;
+    font-weight: 600;
+}
+
+body, p, span, div, button, input, textarea, select {
+    font-family: &#39;Inter&#39;, sans-serif;
+}
+
+/* Smooth transitions for interactive elements */
+.nav-item {
+    transition: color 0.15s ease-in-out;
+}
+
+.nav-item:hover {
+    color: var(--color-accent);
+}
+
+/* Custom shadows for medical app cards */
+.shadow-medical {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Enhanced readability for medical content */
+.content-text {
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+}
+
+/* Professional button styles */
+.btn-medical {
+    font-weight: 500;
+    letter-spacing: 0.025em;
+}
+</style>
+<style>
+body {
+    background-image: radial-gradient(circle at top, var(--color-base-200), var(--color-base-100) 60%);
+}
+
+.tech-animation-container .particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-primary);
+    border-radius: 50%;
+    opacity: 0;
+    animation: particle-flow 4s infinite ease-in-out;
+}
+
+.tech-animation-container .particle:nth-child(1) {
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.tech-animation-container .particle:nth-child(2) {
+    left: 20%;
+    animation-delay: -0.8s;
+    width: 8px;
+    height: 8px;
+}
+
+.tech-animation-container .particle:nth-child(3) {
+    left: 50%;
+    animation-delay: -1.6s;
+}
+
+.tech-animation-container .particle:nth-child(4) {
+    left: 70%;
+    animation-delay: -2.4s;
+    width: 5px;
+    height: 5px;
+}
+
+.tech-animation-container .particle:nth-child(5) {
+    left: 90%;
+    animation-delay: -3.2s;
+}
+
+@keyframes particle-flow {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(1000%);
+        opacity: 0;
+    }
+}
+</style>
+<script src="./assets/static/uxbot/25_6/holder.js"></script></head>
+<body class="bg-base-100 flex flex-col min-h-screen font-body">
+
+<div data-section-id="common_header_web" data-section-type="common_header" class="navbar bg-base-100 px-6 lg:px-20 py-4 shadow-sm sticky top-0 z-50">
+    <!-- Logo Section -->
+    <div class="navbar-start">
+        <div class="dropdown lg:hidden">
+            <div tabindex="0" role="button" class="btn btn-ghost" onclick="toggleMobileMenu()">
+                <span class="iconify" data-icon="heroicons:bars-3" data-width="24"></span>
+            </div>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow bg-base-100 rounded-box w-52 hidden" data-mobile-menu="">
+                <li><a onclick="navigateTo(&#39;about_adhd&#39;)">关于ADHD</a></li>
+                <li><a onclick="navigateTo(&#39;questionnaire_intro&#39;)">开始评估</a></li>
+                <li><a onclick="navigateTo(&#39;privacy_policy&#39;)">隐私政策</a></li>
+                <li><a onclick="navigateTo(&#39;contact_us&#39;)">联系我们</a></li>
+            </ul>
+        </div>
+        <a onclick="navigateTo(&#39;home&#39;)" class="text-2xl font-heading font-bold text-primary cursor-pointer flex items-center gap-3">
+            <span class="iconify text-accent" data-icon="heroicons:brain" data-width="32"></span>
+            <span>ADHD评估助手</span>
+        </a>
+    </div>
+
+    <!-- Navigation Menu -->
+    <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1 gap-8">
+            <li><a onclick="navigateTo(&#39;about_adhd&#39;)" class="nav-item text-base font-medium">关于ADHD</a></li>
+            <li><a onclick="navigateTo(&#39;questionnaire_intro&#39;)" class="nav-item text-base font-medium">开始评估</a></li>
+            <li><a onclick="navigateTo(&#39;privacy_policy&#39;)" class="nav-item text-base font-medium">隐私政策</a></li>
+            <li><a onclick="navigateTo(&#39;contact_us&#39;)" class="nav-item text-base font-medium">联系我们</a></li>
+        </ul>
+    </div>
+
+    <!-- Right Side Actions -->
+    <div class="navbar-end gap-4">
+        <!-- Help/Info Button -->
+        <div class="tooltip" data-tip="帮助与支持">
+            <button class="btn btn-ghost btn-circle" onclick="navigateTo(&#39;contact_us&#39;)">
+                <span class="iconify" data-icon="heroicons:question-mark-circle" data-width="24"></span>
+            </button>
+        </div>
+
+        <!-- User Menu (for future features) -->
+        <div class="dropdown dropdown-end">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                <div class="avatar placeholder inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-content">
+                    <span class="iconify" data-icon="heroicons:user" data-width="20"></span>
+                </div>
+            </div>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow bg-base-100 rounded-box w-52">
+                <li><a onclick="navigateTo(&#39;home&#39;)">首页</a></li>
+                <li><a onclick="navigateTo(&#39;privacy_policy&#39;)">隐私政策</a></li>
+                <li><hr></li>
+                <li><a onclick="navigateTo(&#39;contact_us&#39;)">技术支持</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+[data-section-id="common_header_web"] .navbar {
+    border-bottom: var(--border) solid var(--color-base-300);
+}
+
+[data-section-id="common_header_web"] .nav-item:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+[data-section-id="common_header_web"] .dropdown:hover .dropdown-content {
+    display: block;
+}
+
+[data-section-id="common_header_web"] .btn-circle:hover {
+    background-color: var(--color-base-200);
+}
+
+[data-section-id="common_header_web"] .tooltip:hover .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+}
+</style>
+
+<script>
+(function() {
+    // Close mobile menu when clicking outside
+    document.addEventListener(&#39;click&#39;, function(e) {
+        const mobileMenu = document.querySelector(&#39;[data-mobile-menu]&#39;);
+        const menuButton = e.target.closest(&#39;.dropdown&#39;);
+        
+        if (mobileMenu &amp;&amp; !menuButton &amp;&amp; !mobileMenu.contains(e.target)) {
+            mobileMenu.classList.add(&#39;hidden&#39;);
+        }
+    });
+    
+    // Add active state to current page navigation
+    function updateActiveNavigation() {
+        const currentPage = window.location.pathname.split(&#39;/&#39;).pop().replace(&#39;.html&#39;, &#39;&#39;) || &#39;home&#39;;
+        const navItems = document.querySelectorAll(&#39;.nav-item&#39;);
+        
+        navItems.forEach(item => {
+            const href = item.getAttribute(&#39;onclick&#39;);
+            if (href &amp;&amp; href.includes(currentPage)) {
+                item.classList.add(&#39;text-accent&#39;, &#39;font-semibold&#39;);
+            }
+        });
+    }
+    
+    // Initialize active navigation on page load
+    document.addEventListener(&#39;DOMContentLoaded&#39;, updateActiveNavigation);
+})();
+</script>
+
+<main class="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
+    <section id="ProcessingSection" class="w-full">
+        <div class="card w-full max-w-3xl mx-auto bg-base-100 shadow-medical rounded-box">
+            <div class="card-body items-center p-8 lg:p-12">
+                <h1 class="card-title text-2xl lg:text-3xl font-bold text-center text-primary font-heading" data-type="text">数据处理中，请稍候...</h1>
+                <p class="text-base-content/70 text-center mt-2 mb-8" data-type="text">您的数据正在传输至本地AI模型并进行分析</p>
+
+                <div class="w-full max-w-md mx-auto my-4" data-type="container">
+                    <div class="tech-animation-container h-24 relative overflow-hidden rounded-box bg-primary/5" data-type="container">
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                    </div>
+                </div>
+
+                <progress class="progress progress-primary w-full mt-4" value="0" max="100" id="processing-progress" data-type="progress_bar"></progress>
+                <p class="text-sm text-center mt-2 text-base-content/80" id="progress-text" data-type="text">此过程通常需要几分钟，请耐心等待。</p>
+
+                <div class="divider my-8" data-type="divider"></div>
+
+                <div class="bg-primary/5 p-6 rounded-box w-full" data-type="container">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="iconify text-primary" data-icon="heroicons:lock-closed" data-width="24" data-type="icon"></span>
+                        <h3 class="font-bold text-lg text-primary font-heading" data-type="text">您的数据安全无忧</h3>
+                    </div>
+                    <p class="text-base-content/80 text-sm leading-relaxed" data-type="text">我们承诺，您的所有数据均在您的设备上本地处理，绝不会上传至任何云服务器。您的隐私是我们最高优先事项。</p>
+                </div>
+
+                <div class="mt-6 text-sm text-base-content/70 p-4 border border-base-200 rounded-box w-full" data-type="container">
+                    <p class="font-semibold mb-2 flex items-center gap-2" data-type="text"><span class="iconify" data-icon="heroicons:light-bulb" data-width="16"></span> 温馨提示</p>
+                    <ul class="list-disc list-inside space-y-1 pl-2" data-type="list">
+                        <li data-type="list_item">处理期间请勿关闭或刷新页面。</li>
+                        <li data-type="list_item">处理完成后，系统将自动带您前往结果页面。</li>
+                        <li data-type="list_item">请确保您的设备连接稳定电源。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div data-section-id="common_footer_web" data-section-type="common_footer" class="bg-base-200">
+    <!-- Main Footer Content -->
+    <footer class="footer footer-horizontal p-10 lg:p-20 text-base-content">
+        <!-- About Section -->
+        <aside>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="iconify text-accent" data-icon="heroicons:brain" data-width="32"></span>
+                <span class="text-2xl font-heading font-bold text-primary">ADHD评估助手</span>
+            </div>
+            <p class="text-sm leading-relaxed max-w-xs content-text">
+                本地运行的ADHD评估辅助工具，保护您的隐私数据，提供专业的评估参考。
+                <br><br>
+                <strong class="text-warning">重要提醒：</strong>本系统仅供参考，不能替代专业医疗诊断。
+            </p>
+        </aside>
+
+        <!-- Main Features -->
+        <nav>
+            <header class="footer-title text-primary font-heading">主要功能</header>
+            <a class="link link-hover" onclick="navigateTo(&#39;about_adhd&#39;)">ADHD知识</a>
+            <a class="link link-hover" onclick="navigateTo(&#39;questionnaire_intro&#39;)">在线问卷</a>
+            <a class="link link-hover" onclick="navigateTo(&#39;file_upload&#39;)">文件上传</a>
+            <a class="link link-hover" onclick="navigateTo(&#39;diagnostic_results&#39;)">结果查看</a>
+        </nav>
+
+        <!-- Support &amp; Information -->
+        <nav>
+            <header class="footer-title text-primary font-heading">支持与信息</header>
+            <a class="link link-hover" onclick="navigateTo(&#39;privacy_policy&#39;)">隐私政策</a>
+            <a class="link link-hover" onclick="navigateTo(&#39;contact_us&#39;)">联系我们</a>
+            <a class="link link-hover">使用说明</a>
+            <a class="link link-hover">技术支持</a>
+            <a class="link link-hover">常见问题</a>
+        </nav>
+
+        <!-- Data Security -->
+        <nav>
+            <header class="footer-title text-primary font-heading">数据安全</header>
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="iconify text-success" data-icon="heroicons:shield-check" data-width="16"></span>
+                    <span>本地数据处理</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="iconify text-success" data-icon="heroicons:lock-closed" data-width="16"></span>
+                    <span>无云端上传</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="iconify text-success" data-icon="heroicons:eye-slash" data-width="16"></span>
+                    <span>隐私保护</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="iconify text-info" data-icon="heroicons:cpu-chip" data-width="16"></span>
+                    <span>AI本地运行</span>
+                </div>
+            </div>
+        </nav>
+    </footer>
+
+    <!-- Bottom Copyright Bar -->
+    <footer class="footer footer-center p-6 bg-base-300 text-base-content border-t border-base-content/10">
+        <aside>
+            <div class="flex flex-col sm:flex-row items-center justify-between w-full max-w-6xl gap-4">
+                <p class="text-sm content-text">
+                    © 2025 ADHD评估助手. 保留所有权利.
+                    <span class="text-base-content/70">专注于本地化健康评估工具开发</span>
+                </p>
+                <div class="flex items-center gap-6 text-sm">
+                    <a class="link link-hover" onclick="navigateTo(&#39;privacy_policy&#39;)">隐私条款</a>
+                    <a class="link link-hover" onclick="navigateTo(&#39;contact_us&#39;)">技术支持</a>
+                    <div class="flex items-center gap-2 text-success">
+                        <span class="iconify" data-icon="heroicons:shield-check" data-width="16"></span>
+                        <span>安全可信</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </footer>
+</div>
+
+<style>
+[data-section-id="common_footer_web"] .footer-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+[data-section-id="common_footer_web"] .link-hover:hover {
+    color: var(--color-accent);
+    transition: color 0.15s ease-in-out;
+}
+
+[data-section-id="common_footer_web"] .content-text {
+    line-height: 1.6;
+}
+
+[data-section-id="common_footer_web"] aside p strong {
+    font-weight: 600;
+}
+</style>
+
+<script>
+(function() {
+    // Add footer interaction enhancements
+    document.addEventListener(&#39;DOMContentLoaded&#39;, function() {
+        // Add hover effects for data security items
+        const securityItems = document.querySelectorAll(&#39;[data-section-id="common_footer_web"] nav:last-child .flex.items-center&#39;);
+        
+        securityItems.forEach(item => {
+            item.addEventListener(&#39;mouseenter&#39;, function() {
+                this.classList.add(&#39;bg-base-100&#39;, &#39;rounded-lg&#39;, &#39;p-2&#39;, &#39;-m-2&#39;);
+            });
+            
+            item.addEventListener(&#39;mouseleave&#39;, function() {
+                this.classList.remove(&#39;bg-base-100&#39;, &#39;rounded-lg&#39;, &#39;p-2&#39;, &#39;-m-2&#39;);
+            });
+        });
+    });
+})();
+</script>
+
+<script>
+(function() {
+    // Initialize global namespace
+    window.APP_GLOBALS = window.APP_GLOBALS || {};
+    
+    // Navigation function for page transitions
+    window.navigateTo = function(targetPageId) {
+        const isInIframe = window.self !== window.top;
+        const targetFileName = `${targetPageId}.html`;
+        
+        if (isInIframe) {
+            window.parent.postMessage({
+                type: &#39;iframeNavigation&#39;,
+                targetPageId: targetPageId
+            }, &#39;*&#39;);
+        } else {
+            window.location.href = targetFileName;
+        }
+    };
+    
+    // Mobile menu toggle
+    window.toggleMobileMenu = function() {
+        const mobileMenu = document.querySelector(&#39;[data-mobile-menu]&#39;);
+        if (mobileMenu) {
+            mobileMenu.classList.toggle(&#39;hidden&#39;);
+        }
+    };
+    
+    // Show notification for user feedback
+    window.showNotification = function(message, type = &#39;info&#39;) {
+        const toast = document.createElement(&#39;div&#39;);
+        toast.className = &#39;toast toast-end toast-top z-50&#39;;
+        
+        const alertClass = type === &#39;success&#39; ? &#39;alert-success&#39; : 
+                          type === &#39;error&#39; ? &#39;alert-error&#39; : 
+                          type === &#39;warning&#39; ? &#39;alert-warning&#39; : &#39;alert-info&#39;;
+        
+        const iconName = type === &#39;success&#39; ? &#39;heroicons:check-circle&#39; :
+                        type === &#39;error&#39; ? &#39;heroicons:x-circle&#39; :
+                        type === &#39;warning&#39; ? &#39;heroicons:exclamation-triangle&#39; : &#39;heroicons:information-circle&#39;;
+        
+        toast.innerHTML = `
+            <div class="alert ${alertClass}">
+                <span class="iconify" data-icon="${iconName}" data-width="20"></span>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 4000);
+    };
+    
+    // Handle back navigation
+    window.handleBackNavigation = function() {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            navigateTo(&#39;home&#39;);
+        }
+    };
+    
+    // Progress tracking for multi-step processes
+    window.APP_GLOBALS.updateProgress = function(current, total) {
+        const progressBars = document.querySelectorAll(&#39;[data-progress-bar]&#39;);
+        progressBars.forEach(bar => {
+            const percentage = Math.round((current / total) * 100);
+            bar.value = percentage;
+            bar.textContent = `${percentage}%`;
+        });
+    };
+    
+    // Form validation helper
+    window.APP_GLOBALS.validateForm = function(formElement) {
+        const requiredFields = formElement.querySelectorAll(&#39;[required]&#39;);
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add(&#39;input-error&#39;);
+                isValid = false;
+            } else {
+                field.classList.remove(&#39;input-error&#39;);
+            }
+        });
+        
+        return isValid;
+    };
+})();
+</script>
+<script>
+document.addEventListener(&#39;DOMContentLoaded&#39;, function() {
+    const progressBar = document.getElementById(&#39;processing-progress&#39;);
+    const progressText = document.getElementById(&#39;progress-text&#39;);
+    
+    if (!progressBar || !progressText) return;
+
+    let progress = 0;
+    const totalDuration = 8000; // 8 seconds for simulation
+    const intervalTime = 80; // update every 80ms
+
+    const interval = setInterval(() => {
+        progress += (intervalTime / totalDuration) * 100;
+        if (progress >= 100) {
+            progress = 100;
+            progressBar.value = progress;
+            progressText.textContent = `分析完成！准备跳转...`;
+            clearInterval(interval);
+            
+            setTimeout(() => {
+                // Navigate to the results page after processing is complete
+                navigateTo(&#39;diagnostic_results&#39;);
+            }, 1000);
+        } else {
+            progressBar.value = progress;
+            progressText.textContent = `分析进度: ${Math.round(progress)}%`;
+        }
+    }, intervalTime);
+});
+</script>
+
+<script>
+    setTimeout(() => {
+      Holder.run({
+        domain: "placehold.co"
+      })
+    }, 100)
+  </script></body></html>'></iframe>
+                    </div>
+                  </div>
+
+                </body>
+                </html>
+            

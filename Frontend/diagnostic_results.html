@@ -1,0 +1,778 @@
+
+                <!DOCTYPE html>
+                <html lang="zh">
+                <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>诊断结果</title>
+                  <style>
+                    *,
+                    *::before,
+                    *::after {
+                      box-sizing: border-box;
+                      margin: 0;
+                    }
+                    .iframe-outer {
+                      position: fixed;
+                      top: 0;
+                      left: 0;
+                      bottom: 0;
+                      right: 0;
+                      display: flex;
+                      justify-content: center;
+                      background-color: #E0E0E0;
+                    }
+                    .iframe-wrapper {
+                      width: 100%;
+                      height: 100%;
+                      margin: 0 auto;
+                      transform-origin: center top;
+                      flex-shrink: 0;
+                    }
+                    #dynamicIframe {
+                      border: none;
+                      width: 100%;
+                      height: 100%;
+                    }
+                  </style>
+                  <script>
+                const width = 1920
+                const height = 1080
+                const resolutionRatio = width && height ? width / height : 1
+                const pageNameMap = {
+                  'home': '首页',
+    'questionnaire_multi_step': 'ADHD问卷',
+    'file_upload': '文件上传',
+    'processing_data': '数据处理中',
+    'diagnostic_results': '诊断结果'
+                }
+                function setIframeSize(w, h) {
+                  const currentContainerRadio = w / h
+                  let widthValue = w
+                  let heightValue = h
+                  let zoom = 1
+                  if (currentContainerRadio > resolutionRatio) {
+                    widthValue = h * resolutionRatio
+                    heightValue = h
+                  } else {
+                    widthValue = w
+                    heightValue = w / resolutionRatio
+                  }
+                  zoom = width ? widthValue / width : 1
+                  return {
+                    width: widthValue / zoom + 'px',
+                    height: heightValue / zoom + 'px',
+                    zoom,
+                  }
+                }
+                function adjustIframeSize() {
+                  const iframeWrapper = document.querySelector(".iframe-wrapper")
+                  const { width, height, zoom } = setIframeSize(window.innerWidth, window.innerHeight)
+                  iframeWrapper.style.height = height
+                  iframeWrapper.style.width = width
+                  iframeWrapper.style.transform = 'scale(' + zoom + ')'
+                }
+                function sanitizeFilename(name) {
+                  return name.replace(/[\/:*?"<>|]/g, '_')
+                }
+                function handlePostMessage(event) {
+                  if (!event.data) {
+                    return
+                  }
+                  const { type, targetPageId } = event.data
+                  const targetPageName = pageNameMap[targetPageId]
+                  if (type === "iframeNavigation" && targetPageId && targetPageName) {
+                    window.location.href = targetPageName + '.html'
+                  }
+                }
+                window.addEventListener('message', handlePostMessage)
+                window.onload = adjustIframeSize
+                window.onresize = adjustIframeSize
+                window.onunload = () => {
+                  window.removeEventListener('message', handlePostMessage)
+                }
+              </script>
+                </head>
+                <body>
+                  <div class="iframe-outer">
+                    <div class="iframe-wrapper">
+                      <iframe id="dynamicIframe" srcdoc='<html lang="简体中文" data-theme="corporate"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>诊断结果 - ADHD评估助手</title>
+    <link href="./assets/static/uxbot/daisyui@5.css" rel="stylesheet" type="text/css">
+    <script src="./assets/static/uxbot/tailwind-browser@4.js"></script>
+    <link href="./assets/static/uxbot/daisyui-themes.css" rel="stylesheet" type="text/css">
+    <script src="./assets/3/3.1.1/iconify.min.js"></script>
+    <style>
+/* Import Google Fonts */
+@import url(&#39;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Source+Sans+Pro:wght@400;600;700&amp;display=swap&#39;);
+
+/* daisyUI Theme Variables Customization
+ * Based on the "corporate" theme for professional medical application
+ */
+:root {
+    /* Brand Colors - Professional Medical Theme */
+    --color-primary: rgba(31, 41, 64, 1);        /* Deep Navy for trust and professionalism */
+    --color-primary-content: rgba(255, 255, 255, 1);
+    --color-secondary: rgba(52, 73, 94, 1);      /* Charcoal for secondary elements */
+    --color-secondary-content: rgba(255, 255, 255, 1);
+    --color-accent: rgba(41, 128, 185, 1);       /* Professional blue for highlights */
+    --color-accent-content: rgba(255, 255, 255, 1);
+    
+    /* Background Colors - Clean Medical Aesthetic */
+    --color-base-100: rgba(249, 249, 249, 1);    /* Off-white background */
+    --color-base-200: rgba(242, 242, 242, 1);    /* Slightly darker for sections */
+    --color-base-300: rgba(226, 226, 226, 1);    /* Light grey for borders */
+    --color-base-content: rgba(31, 41, 64, 1);   /* Deep Navy for text */
+    
+    /* Semantic colors for medical context */
+    --color-success: rgba(39, 174, 96, 1);       /* Professional green */
+    --color-success-content: rgba(255, 255, 255, 1);
+    --color-error: rgba(231, 76, 60, 1);         /* Calm red for errors */
+    --color-error-content: rgba(255, 255, 255, 1);
+    --color-warning: rgba(243, 156, 18, 1);      /* Amber for warnings */
+    --color-warning-content: rgba(31, 41, 64, 1);
+    --color-info: rgba(52, 152, 219, 1);         /* Info blue */
+    --color-info-content: rgba(255, 255, 255, 1);
+    
+    /* Border radius and effects - Modern yet structured */
+    --radius-box: 0.5rem;   /* 8px for cards and containers */
+    --radius-field: 0.5rem; /* 8px for form elements */
+    --radius-selector: 0.5rem; /* 8px for buttons and selectors */
+    --border: 1px;
+}
+
+/* Typography - Professional and readable */
+.font-heading {
+    font-family: &#39;Source Sans Pro&#39;, sans-serif;
+}
+
+.font-body {
+    font-family: &#39;Inter&#39;, sans-serif;
+}
+
+/* Apply fonts globally */
+h1, h2, h3, h4, h5, h6 {
+    font-family: &#39;Source Sans Pro&#39;, sans-serif;
+    font-weight: 600;
+}
+
+body, p, span, div, button, input, textarea, select {
+    font-family: &#39;Inter&#39;, sans-serif;
+}
+
+/* Smooth transitions for interactive elements */
+.nav-item {
+    transition: color 0.15s ease-in-out;
+}
+
+.nav-item:hover {
+    color: var(--color-accent);
+}
+
+/* Custom shadows for medical app cards */
+.shadow-medical {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Enhanced readability for medical content */
+.content-text {
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+}
+
+/* Professional button styles */
+.btn-medical {
+    font-weight: 500;
+    letter-spacing: 0.025em;
+}
+</style>
+    <style>
+/* Custom CSS styles for the Diagnostic Results page */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+/* Staggered animation for list items */
+#RecommendationsAndDisclaimer ul li,
+#NextStepsGuidance .card,
+#RelatedResources .card {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+@for $i from 1 to 10 {
+    .fade-in-up:nth-child(#{$i}),
+    li:nth-child(#{$i}),
+    .grid > .card:nth-child(#{$i}) {
+        animation-delay: calc(#{$i} * 0.1s);
+    }
+}
+
+/* Applying subtle texture to bg-base-200 for a material feel, as requested */
+.bg-base-200, .bg-gradient-to-br {
+    /* A very subtle noise texture */
+    background-image: var(--noise, linear-gradient(transparent, transparent)), url("data:image/svg+xml,%3Csvg viewBox=&#39;0 0 400 400&#39; xmlns=&#39;http://www.w3.org/2000/svg&#39;%3E%3Cfilter id=&#39;noise&#39;%3E%3CfeTurbulence type=&#39;fractalNoise&#39; baseFrequency=&#39;0.9&#39; numOctaves=&#39;3&#39; stitchTiles=&#39;stitch&#39;/%3E%3CfeColorMatrix type=&#39;saturate&#39; values=&#39;0&#39;/%3E%3C/filter%3E%3Crect width=&#39;100%25&#39; height=&#39;100%25&#39; filter=&#39;url(%23noise)&#39;/%3E%3C/svg%3E");
+    background-size: cover;
+    background-blend-mode: overlay;
+    background-position: center;
+}
+
+/* Custom styles for professional buttons */
+.btn-medical {
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+</style>
+<script src="./assets/static/uxbot/25_6/holder.js"></script></head>
+<body class="font-body bg-base-100 text-base-content">
+    
+    <div data-section-id="common_header_web" data-section-type="common_header" class="navbar bg-base-100 px-6 lg:px-20 py-4 shadow-sm sticky top-0 z-50">
+    <!-- Logo Section -->
+    <div class="navbar-start">
+        <div class="dropdown lg:hidden">
+            <div tabindex="0" role="button" class="btn btn-ghost" onclick="toggleMobileMenu()">
+                <span class="iconify" data-icon="heroicons:bars-3" data-width="24"></span>
+            </div>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow bg-base-100 rounded-box w-52 hidden" data-mobile-menu="">
+                <li><a onclick="navigateTo(&#39;about_adhd&#39;)">关于ADHD</a></li>
+                <li><a onclick="navigateTo(&#39;questionnaire_intro&#39;)">开始评估</a></li>
+                <li><a onclick="navigateTo(&#39;privacy_policy&#39;)">隐私政策</a></li>
+                <li><a onclick="navigateTo(&#39;contact_us&#39;)">联系我们</a></li>
+            </ul>
+        </div>
+        <a onclick="navigateTo(&#39;home&#39;)" class="text-2xl font-heading font-bold text-primary cursor-pointer flex items-center gap-3">
+            <span class="iconify text-accent" data-icon="heroicons:brain" data-width="32"></span>
+            <span>ADHD评估助手</span>
+        </a>
+    </div>
+
+    <!-- Navigation Menu -->
+    <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1 gap-8">
+            <li><a onclick="navigateTo(&#39;about_adhd&#39;)" class="nav-item text-base font-medium">关于ADHD</a></li>
+            <li><a onclick="navigateTo(&#39;questionnaire_intro&#39;)" class="nav-item text-base font-medium">开始评估</a></li>
+            <li><a onclick="navigateTo(&#39;privacy_policy&#39;)" class="nav-item text-base font-medium">隐私政策</a></li>
+            <li><a onclick="navigateTo(&#39;contact_us&#39;)" class="nav-item text-base font-medium">联系我们</a></li>
+        </ul>
+    </div>
+
+    <!-- Right Side Actions -->
+    <div class="navbar-end gap-4">
+        <!-- Help/Info Button -->
+        <div class="tooltip" data-tip="帮助与支持">
+            <button class="btn btn-ghost btn-circle" onclick="navigateTo(&#39;contact_us&#39;)">
+                <span class="iconify" data-icon="heroicons:question-mark-circle" data-width="24"></span>
+            </button>
+        </div>
+
+        <!-- User Menu (for future features) -->
+        <div class="dropdown dropdown-end">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                <div class="avatar placeholder inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-content">
+                    <span class="iconify" data-icon="heroicons:user" data-width="20"></span>
+                </div>
+            </div>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow bg-base-100 rounded-box w-52">
+                <li><a onclick="navigateTo(&#39;home&#39;)">首页</a></li>
+                <li><a onclick="navigateTo(&#39;privacy_policy&#39;)">隐私政策</a></li>
+                <li><hr></li>
+                <li><a onclick="navigateTo(&#39;contact_us&#39;)">技术支持</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+[data-section-id="common_header_web"] .navbar {
+    border-bottom: var(--border) solid var(--color-base-300);
+}
+
+[data-section-id="common_header_web"] .nav-item:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+[data-section-id="common_header_web"] .dropdown:hover .dropdown-content {
+    display: block;
+}
+
+[data-section-id="common_header_web"] .btn-circle:hover {
+    background-color: var(--color-base-200);
+}
+
+[data-section-id="common_header_web"] .tooltip:hover .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+}
+</style>
+
+<script>
+(function() {
+    // Close mobile menu when clicking outside
+    document.addEventListener(&#39;click&#39;, function(e) {
+        const mobileMenu = document.querySelector(&#39;[data-mobile-menu]&#39;);
+        const menuButton = e.target.closest(&#39;.dropdown&#39;);
+        
+        if (mobileMenu &amp;&amp; !menuButton &amp;&amp; !mobileMenu.contains(e.target)) {
+            mobileMenu.classList.add(&#39;hidden&#39;);
+        }
+    });
+    
+    // Add active state to current page navigation
+    function updateActiveNavigation() {
+        const currentPage = window.location.pathname.split(&#39;/&#39;).pop().replace(&#39;.html&#39;, &#39;&#39;) || &#39;home&#39;;
+        const navItems = document.querySelectorAll(&#39;.nav-item&#39;);
+        
+        navItems.forEach(item => {
+            const href = item.getAttribute(&#39;onclick&#39;);
+            if (href &amp;&amp; href.includes(currentPage)) {
+                item.classList.add(&#39;text-accent&#39;, &#39;font-semibold&#39;);
+            }
+        });
+    }
+    
+    // Initialize active navigation on page load
+    document.addEventListener(&#39;DOMContentLoaded&#39;, updateActiveNavigation);
+})();
+</script>
+
+    <main class="bg-base-100">
+        <div class="container mx-auto px-6 lg:px-20 py-12">
+            
+            <!-- Section: DiagnosticResultsSummary -->
+            <section id="DiagnosticResultsSummary" class="fade-in-up mb-12">
+                <div class="text-center mb-8">
+                    <h1 data-type="text" class="text-4xl lg:text-5xl font-bold font-heading text-primary">ADHD评估结果</h1>
+                    <p data-type="text" class="mt-4 text-base-content/70 max-w-3xl mx-auto content-text">本结果由AI模型根据您提交的数据初步生成，旨在提供参考信息，不作为最终的医疗诊断依据。</p>
+                </div>
+
+                <div data-type="container" class="card bg-base-200 shadow-medical rounded-box">
+                    <div class="card-body p-6 lg:p-8">
+                        <h2 data-type="text" class="card-title text-xl font-semibold text-primary mb-4">结果摘要</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 text-center">
+                            <div data-type="container" data-repeatable="true" class="p-4 bg-base-100 rounded-box">
+                                <p data-type="text" class="text-sm text-base-content/60">注意力缺失</p>
+                                <p data-type="text" class="text-2xl font-bold text-secondary mt-1">中度迹象</p>
+                            </div>
+                            <div data-type="container" data-repeatable="true" class="p-4 bg-base-100 rounded-box">
+                                <p data-type="text" class="text-sm text-base-content/60">多动与冲动</p>
+                                <p data-type="text" class="text-2xl font-bold text-secondary mt-1">轻度迹象</p>
+                            </div>
+                            <div data-type="container" data-repeatable="true" class="p-4 bg-base-100 rounded-box">
+                                <p data-type="text" class="text-sm text-base-content/60">执行功能</p>
+                                <p data-type="text" class="text-2xl font-bold text-secondary mt-1">存在挑战</p>
+                            </div>
+                            <div data-type="container" data-repeatable="true" class="p-4 bg-base-100 rounded-box">
+                                <p data-type="text" class="text-sm text-base-content/60">情绪调节</p>
+                                <p data-type="text" class="text-2xl font-bold text-secondary mt-1">较为稳定</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section: RiskLevelDisplay -->
+            <section id="RiskLevelDisplay" class="fade-in-up mb-12">
+                 <div data-type="container" class="card bg-gradient-to-br from-warning/80 to-orange-400 text-warning-content shadow-lg rounded-box overflow-hidden">
+                    <div class="card-body p-8 text-center items-center">
+                        <h2 data-type="text" class="card-title text-2xl font-semibold mb-2">综合风险等级</h2>
+                        <div class="flex items-center gap-4 my-4">
+                           <span class="iconify text-5xl" data-icon="heroicons:exclamation-triangle" data-width="48"></span>
+                           <p data-type="text" class="text-5xl font-bold">中等风险</p>
+                        </div>
+                        <p data-type="text" class="max-w-2xl mx-auto content-text">评估显示您可能存在一些与ADHD相关的典型挑战。这些挑战可能会影响您的日常生活、工作或学习效率。建议您关注并采取适当措施。</p>
+                        <div data-type="container" class="alert bg-base-100/20 text-warning-content mt-6 border-0">
+                             <span class="iconify" data-icon="heroicons:information-circle" data-width="20"></span>
+                            <span data-type="text" class="text-sm">该风险等级是基于算法的推断，并非临床诊断。</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section: RecommendationsAndDisclaimer -->
+            <section id="RecommendationsAndDisclaimer" class="fade-in-up mb-12">
+                <div data-type="container" class="card bg-base-200 shadow-medical rounded-box">
+                    <div class="card-body p-6 lg:p-8">
+                        <h2 data-type="text" class="card-title text-xl font-semibold text-primary mb-4">个性化建议</h2>
+                        <ul data-type="container" class="space-y-4 list-disc list-inside content-text">
+                            <li data-type="text" data-repeatable="true"><b>行为调整:</b> 尝试使用番茄工作法（25分钟专注，5分钟休息）来提升任务持久性。</li>
+                            <li data-type="text" data-repeatable="true"><b>学习策略:</b> 将大型任务分解为更小、可管理的步骤，并为每个步骤设定明确的截止日期。</li>
+                            <li data-type="text" data-repeatable="true"><b>生活习惯:</b> 确保每晚7-8小时的充足睡眠，并进行规律的体育锻炼，这有助于改善注意力和情绪。</li>
+                            <li data-type="text" data-repeatable="true"><b>环境优化:</b> 减少工作环境中的干扰，例如整理桌面、关闭不必要的通知。</li>
+                        </ul>
+                        <div class="divider my-6">专业咨询推荐</div>
+                        <div class="text-center">
+                             <p class="mb-4 text-base-content/80">如果您对评估结果感到担忧，或希望获得更权威的诊断和支持，我们强烈建议您咨询专业人士。</p>
+                             <button data-type="button" class="btn btn-primary btn-medical" onclick="navigateTo(&#39;contact_us&#39;)">
+                                <span class="iconify" data-icon="heroicons:user-group" data-width="20"></span>
+                                预约专业咨询
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div data-type="container" class="alert alert-error shadow-lg p-6 mt-8 rounded-box">
+                    <span class="iconify text-3xl" data-icon="heroicons:shield-exclamation-solid" data-width="36"></span>
+                    <div>
+                        <h3 data-type="text" class="font-bold text-lg">重要免责声明</h3>
+                        <div data-type="text" class="text-base font-semibold">本评估结果仅供参考，不构成最终医疗诊断。请勿自行诊断或治疗。如有任何疑虑，请务必咨询专业的医疗机构和医生。</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: NextStepsGuidance -->
+            <section id="NextStepsGuidance" class="fade-in-up mb-12 text-center">
+                <h2 data-type="text" class="text-3xl font-bold font-heading text-primary mb-8">下一步您可以这样做</h2>
+                <div data-type="container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div data-type="container" data-repeatable="true" class="card bg-base-200 shadow-medical rounded-box transform hover:-translate-y-1 transition-transform duration-300">
+                        <div class="card-body items-center text-center p-6">
+                            <div class="p-3 bg-primary/10 rounded-full mb-3"><span class="iconify text-primary text-3xl" data-icon="heroicons:book-open"></span></div>
+                            <h3 data-type="text" class="card-title">记录日常行为</h3>
+                            <p data-type="text" class="text-sm text-base-content/70">记录对您造成困扰的具体事件，有助于专业咨询。</p>
+                        </div>
+                    </div>
+                     <div data-type="container" data-repeatable="true" class="card bg-base-200 shadow-medical rounded-box transform hover:-translate-y-1 transition-transform duration-300">
+                        <div class="card-body items-center text-center p-6">
+                            <div class="p-3 bg-primary/10 rounded-full mb-3"><span class="iconify text-primary text-3xl" data-icon="heroicons:magnifying-glass-plus"></span></div>
+                            <h3 data-type="text" class="card-title">了解更多知识</h3>
+                            <p data-type="text" class="text-sm text-base-content/70">浏览我们提供的资源，科学认识ADHD。</p>
+                        </div>
+                    </div>
+                     <div data-type="container" data-repeatable="true" class="card bg-base-200 shadow-medical rounded-box transform hover:-translate-y-1 transition-transform duration-300">
+                        <div class="card-body items-center text-center p-6">
+                            <div class="p-3 bg-primary/10 rounded-full mb-3"><span class="iconify text-primary text-3xl" data-icon="heroicons:chat-bubble-left-right"></span></div>
+                            <h3 data-type="text" class="card-title">与家人朋友沟通</h3>
+                            <p data-type="text" class="text-sm text-base-content/70">与您信任的人分享感受，寻求理解和支持。</p>
+                        </div>
+                    </div>
+                    <div data-type="container" data-repeatable="true" class="card bg-base-200 shadow-medical rounded-box transform hover:-translate-y-1 transition-transform duration-300">
+                        <div class="card-body items-center text-center p-6">
+                           <div class="p-3 bg-primary/10 rounded-full mb-3"><span class="iconify text-primary text-3xl" data-icon="heroicons:arrow-uturn-left"></span></div>
+                            <h3 data-type="text" class="card-title">返回首页</h3>
+                            <p data-type="text" class="text-sm text-base-content/70">完成本次评估，随时可以回来查看结果。</p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="mt-12">
+                    <button data-type="button" class="btn btn-secondary btn-wide btn-medical" onclick="navigateTo(&#39;home&#39;)">返回首页</button>
+                </div>
+            </section>
+            
+            <!-- Section: RelatedResources -->
+            <section id="RelatedResources" class="fade-in-up">
+                <h2 data-type="text" class="text-3xl font-bold font-heading text-primary mb-8 text-center">ADHD相关资源推荐</h2>
+                <div data-type="container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div data-type="container" data-repeatable="true" class="card bg-base-200 shadow-medical rounded-box">
+                        <figure class="px-6 pt-6"><img data-type="image" alt="Educational platform for ADHD" class="rounded-lg h-40 w-full object-cover" data-src="placehold.co/400x200.png?text=Educational+Platform"></figure>
+                        <div class="card-body p-6">
+                            <h3 data-type="text" class="card-title">ADHD知识中心</h3>
+                            <p data-type="text" class="text-sm text-base-content/70 flex-grow">权威的ADHD教育平台，提供最新的研究和应对策略。</p>
+                            <div class="card-actions justify-end mt-4">
+                                <a href="#" target="_blank" class="btn btn-ghost text-primary nav-item">了解更多</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-type="container" data-repeatable="true" class="card bg-base-200 shadow-medical rounded-box">
+                        <figure class="px-6 pt-6"><img data-type="image" alt="Support community for adults with ADHD" class="rounded-lg h-40 w-full object-cover" data-src="placehold.co/400x200.png?text=Support+Community"></figure>
+                        <div class="card-body p-6">
+                            <h3 data-type="text" class="card-title">成人ADHD支持社区</h3>
+                            <p data-type="text" class="text-sm text-base-content/70 flex-grow">一个友好的在线社区，与有相似经历的人交流分享。</p>
+                            <div class="card-actions justify-end mt-4">
+                                <a href="#" target="_blank" class="btn btn-ghost text-primary nav-item">加入社区</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-type="container" data-repeatable="true" class="card bg-base-200 shadow-medical rounded-box">
+                        <figure class="px-6 pt-6"><img data-type="image" alt="Guides for parents of children with ADHD" class="rounded-lg h-40 w-full object-cover" data-src="placehold.co/400x200.png?text=Parental+Guides"></figure>
+                        <div class="card-body p-6">
+                            <h3 data-type="text" class="card-title">家长指导手册</h3>
+                            <p data-type="text" class="text-sm text-base-content/70 flex-grow">专为ADHD儿童的家长设计的实用指南和工具。</p>
+                            <div class="card-actions justify-end mt-4">
+                                <a href="#" target="_blank" class="btn btn-ghost text-primary nav-item">阅读指南</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div data-section-id="common_footer_web" data-section-type="common_footer" class="bg-base-200">
+    <!-- Main Footer Content -->
+    <footer class="footer footer-horizontal p-10 lg:p-20 text-base-content">
+        <!-- About Section -->
+        <aside>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="iconify text-accent" data-icon="heroicons:brain" data-width="32"></span>
+                <span class="text-2xl font-heading font-bold text-primary">ADHD评估助手</span>
+            </div>
+            <p class="text-sm leading-relaxed max-w-xs content-text">
+                本地运行的ADHD评估辅助工具，保护您的隐私数据，提供专业的评估参考。
+                <br><br>
+                <strong class="text-warning">重要提醒：</strong>本系统仅供参考，不能替代专业医疗诊断。
+            </p>
+        </aside>
+
+        <!-- Main Features -->
+        <nav>
+            <header class="footer-title text-primary font-heading">主要功能</header>
+            <a class="link link-hover" onclick="navigateTo(&#39;about_adhd&#39;)">ADHD知识</a>
+            <a class="link link-hover" onclick="navigateTo(&#39;questionnaire_intro&#39;)">在线问卷</a>
+            <a class="link link-hover" onclick="navigateTo(&#39;file_upload&#39;)">文件上传</a>
+            <a class="link link-hover" onclick="navigateTo(&#39;diagnostic_results&#39;)">结果查看</a>
+        </nav>
+
+        <!-- Support &amp; Information -->
+        <nav>
+            <header class="footer-title text-primary font-heading">支持与信息</header>
+            <a class="link link-hover" onclick="navigateTo(&#39;privacy_policy&#39;)">隐私政策</a>
+            <a class="link link-hover" onclick="navigateTo(&#39;contact_us&#39;)">联系我们</a>
+            <a class="link link-hover">使用说明</a>
+            <a class="link link-hover">技术支持</a>
+            <a class="link link-hover">常见问题</a>
+        </nav>
+
+        <!-- Data Security -->
+        <nav>
+            <header class="footer-title text-primary font-heading">数据安全</header>
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="iconify text-success" data-icon="heroicons:shield-check" data-width="16"></span>
+                    <span>本地数据处理</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="iconify text-success" data-icon="heroicons:lock-closed" data-width="16"></span>
+                    <span>无云端上传</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="iconify text-success" data-icon="heroicons:eye-slash" data-width="16"></span>
+                    <span>隐私保护</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="iconify text-info" data-icon="heroicons:cpu-chip" data-width="16"></span>
+                    <span>AI本地运行</span>
+                </div>
+            </div>
+        </nav>
+    </footer>
+
+    <!-- Bottom Copyright Bar -->
+    <footer class="footer footer-center p-6 bg-base-300 text-base-content border-t border-base-content/10">
+        <aside>
+            <div class="flex flex-col sm:flex-row items-center justify-between w-full max-w-6xl gap-4">
+                <p class="text-sm content-text">
+                    © 2025 ADHD评估助手. 保留所有权利.
+                    <span class="text-base-content/70">专注于本地化健康评估工具开发</span>
+                </p>
+                <div class="flex items-center gap-6 text-sm">
+                    <a class="link link-hover" onclick="navigateTo(&#39;privacy_policy&#39;)">隐私条款</a>
+                    <a class="link link-hover" onclick="navigateTo(&#39;contact_us&#39;)">技术支持</a>
+                    <div class="flex items-center gap-2 text-success">
+                        <span class="iconify" data-icon="heroicons:shield-check" data-width="16"></span>
+                        <span>安全可信</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </footer>
+</div>
+
+<style>
+[data-section-id="common_footer_web"] .footer-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+[data-section-id="common_footer_web"] .link-hover:hover {
+    color: var(--color-accent);
+    transition: color 0.15s ease-in-out;
+}
+
+[data-section-id="common_footer_web"] .content-text {
+    line-height: 1.6;
+}
+
+[data-section-id="common_footer_web"] aside p strong {
+    font-weight: 600;
+}
+</style>
+
+<script>
+(function() {
+    // Add footer interaction enhancements
+    document.addEventListener(&#39;DOMContentLoaded&#39;, function() {
+        // Add hover effects for data security items
+        const securityItems = document.querySelectorAll(&#39;[data-section-id="common_footer_web"] nav:last-child .flex.items-center&#39;);
+        
+        securityItems.forEach(item => {
+            item.addEventListener(&#39;mouseenter&#39;, function() {
+                this.classList.add(&#39;bg-base-100&#39;, &#39;rounded-lg&#39;, &#39;p-2&#39;, &#39;-m-2&#39;);
+            });
+            
+            item.addEventListener(&#39;mouseleave&#39;, function() {
+                this.classList.remove(&#39;bg-base-100&#39;, &#39;rounded-lg&#39;, &#39;p-2&#39;, &#39;-m-2&#39;);
+            });
+        });
+    });
+})();
+</script>
+
+    <script>
+(function() {
+    // Initialize global namespace
+    window.APP_GLOBALS = window.APP_GLOBALS || {};
+    
+    // Navigation function for page transitions
+    window.navigateTo = function(targetPageId) {
+        const isInIframe = window.self !== window.top;
+        const targetFileName = `${targetPageId}.html`;
+        
+        if (isInIframe) {
+            window.parent.postMessage({
+                type: &#39;iframeNavigation&#39;,
+                targetPageId: targetPageId
+            }, &#39;*&#39;);
+        } else {
+            window.location.href = targetFileName;
+        }
+    };
+    
+    // Mobile menu toggle
+    window.toggleMobileMenu = function() {
+        const mobileMenu = document.querySelector(&#39;[data-mobile-menu]&#39;);
+        if (mobileMenu) {
+            mobileMenu.classList.toggle(&#39;hidden&#39;);
+        }
+    };
+    
+    // Show notification for user feedback
+    window.showNotification = function(message, type = &#39;info&#39;) {
+        const toast = document.createElement(&#39;div&#39;);
+        toast.className = &#39;toast toast-end toast-top z-50&#39;;
+        
+        const alertClass = type === &#39;success&#39; ? &#39;alert-success&#39; : 
+                          type === &#39;error&#39; ? &#39;alert-error&#39; : 
+                          type === &#39;warning&#39; ? &#39;alert-warning&#39; : &#39;alert-info&#39;;
+        
+        const iconName = type === &#39;success&#39; ? &#39;heroicons:check-circle&#39; :
+                        type === &#39;error&#39; ? &#39;heroicons:x-circle&#39; :
+                        type === &#39;warning&#39; ? &#39;heroicons:exclamation-triangle&#39; : &#39;heroicons:information-circle&#39;;
+        
+        toast.innerHTML = `
+            <div class="alert ${alertClass}">
+                <span class="iconify" data-icon="${iconName}" data-width="20"></span>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 4000);
+    };
+    
+    // Handle back navigation
+    window.handleBackNavigation = function() {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            navigateTo(&#39;home&#39;);
+        }
+    };
+    
+    // Progress tracking for multi-step processes
+    window.APP_GLOBALS.updateProgress = function(current, total) {
+        const progressBars = document.querySelectorAll(&#39;[data-progress-bar]&#39;);
+        progressBars.forEach(bar => {
+            const percentage = Math.round((current / total) * 100);
+            bar.value = percentage;
+            bar.textContent = `${percentage}%`;
+        });
+    };
+    
+    // Form validation helper
+    window.APP_GLOBALS.validateForm = function(formElement) {
+        const requiredFields = formElement.querySelectorAll(&#39;[required]&#39;);
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add(&#39;input-error&#39;);
+                isValid = false;
+            } else {
+                field.classList.remove(&#39;input-error&#39;);
+            }
+        });
+        
+        return isValid;
+    };
+})();
+</script>
+    <script>
+/* JavaScript for Diagnostic Results page */
+document.addEventListener(&#39;DOMContentLoaded&#39;, () => {
+    // This page is primarily informational. Complex JS logic is not required.
+    // The fade-in animations are handled by CSS.
+    // The navigation functions are globally available from common_script.js.
+    
+    // An Intersection Observer can be used for more controlled animations if needed,
+    // but pure CSS with animation-delay is sufficient and simpler for this case.
+    const animatedElements = document.querySelectorAll(&#39;.fade-in-up&#39;);
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add(&#39;is-visible&#39;);
+                // Optional: Stop observing after it becomes visible to save resources
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1 // Triggers when 10% of the element is visible
+    });
+
+    animatedElements.forEach(el => {
+        observer.observe(el);
+    });
+
+});
+
+// Stub function for any potential future interactions, not currently used.
+function handleResourceClick(resourceName) {
+    console.log(`User clicked on resource: ${resourceName}`);
+    // Potentially track this event with an analytics tool.
+}
+
+</script>
+
+<script>
+    setTimeout(() => {
+      Holder.run({
+        domain: "placehold.co"
+      })
+    }, 100)
+  </script></body></html>'></iframe>
+                    </div>
+                  </div>
+
+                </body>
+                </html>
+            

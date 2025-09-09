@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home · ADHD Assessment Assistant</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0}
+    .iframe-outer{position:fixed;inset:0;display:flex;justify-content:center;background:#0f172a}
+    .iframe-wrapper{width:100%;height:100%;transform-origin:center top;flex-shrink:0}
+    #dynamicIframe{border:0;width:100%;height:100%}
+  </style>
+  <script>
+    // ===== Fixed-canvas auto-scale =====
+    const width=1920,height=1080,ratio=width/height;
+    const pageNameMap={home:'home',questionnaire_multi_step:'questionnaire_multi_step',file_upload:'file_upload',processing_data:'processing_data',diagnostic_results:'diagnostic_results'};
+    function setSize(w,h){const r=w/h;let W=w,H=h; if(r>ratio){W=h*ratio;H=h}else{W=w;H=w/ratio} const z=W/width;return{w:W/z+'px',h:H/z+'px',z}}
+    function applySize(){const wrap=document.querySelector('.iframe-wrapper');const {w,h,z}=setSize(innerWidth,innerHeight);wrap.style.width=w;wrap.style.height=h;wrap.style.transform='scale('+z+')'}
+    function onMsg(e){const d=e.data||{};if(d.type==='iframeNavigation'){const name=pageNameMap[d.targetPageId];if(name)location.href=name+'.html'}}
+    addEventListener('message',onMsg);addEventListener('resize',applySize);addEventListener('load',applySize);
+  </script>
+</head>
+<body>
+  <div class="iframe-outer">
+    <div class="iframe-wrapper">
+      <iframe id="dynamicIframe" srcdoc='
+<!DOCTYPE html>
+<html lang="en" data-theme="corporate">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>ADHD Assessment Assistant</title>
+  <meta name="description" content="Local, privacy-first ADHD self-assessment with professional references."/>
+
+  <!-- DaisyUI + Tailwind -->
+  <link href="./assets/static/lib/daisyui@5.css" rel="stylesheet"/>
+  <script src="./assets/static/lib/tailwind-browser@4.js"></script>
+  <link href="./assets/static/lib/daisyui-themes.css" rel="stylesheet"/>
+  <!-- Iconify -->
+  <script src="./assets/3/3.1.1/iconify.min.js"></script>
+
+  <style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Sans+Pro:wght@600;700&display=swap");
+  :root{
+    --color-primary:#1E2A78; --color-accent:#2563eb; --glass-bg:rgba(255,255,255,.65);
+    --glass-bd:rgba(255,255,255,.25); --shadow-lg:0 20px 40px rgba(2,6,23,.15);
+  }
+  html{scroll-behavior:smooth}
+  .font-heading{font-family:"Source Sans Pro",system-ui,sans-serif}
+  .font-body{font-family:"Inter",system-ui,sans-serif}
+  .nav-blur{backdrop-filter:saturate(120%) blur(8px); background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.6))}
+  .dark .nav-blur{background:linear-gradient(180deg,rgba(15,23,42,.7),rgba(15,23,42,.45))}
+  .hero-bg{
+    background:
+      radial-gradient(1200px 600px at 15% 0%, rgba(37,99,235,.20), transparent 60%),
+      radial-gradient(1000px 700px at 85% 20%, rgba(99,102,241,.18), transparent 60%),
+      linear-gradient(180deg,#f8fafc 0%,#eef2ff 60%,#ffffff 100%);
+  }
+  .dark .hero-bg{
+    background:
+      radial-gradient(1200px 600px at 15% 0%, rgba(59,130,246,.20), transparent 60%),
+      radial-gradient(1000px 700px at 85% 20%, rgba(139,92,246,.18), transparent 60%),
+      linear-gradient(180deg,#0b1220 0%,#0f172a 60%,#0b1220 100%);
+  }
+  .glass{
+    background:var(--glass-bg);
+    border:1px solid var(--glass-bd);
+    box-shadow:var(--shadow-lg);
+    backdrop-filter:saturate(140%) blur(10px);
+  }
+  .fancy-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(2,6,23,.15),transparent)}
+  .fancy-badge{
+    --tw: inset 0 0 0 1px rgba(255,255,255,.35), 0 6px 20px rgba(2,6,23,.12);
+    background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.55));
+    box-shadow:var(--tw); backdrop-filter:blur(6px)
+  }
+  .dark .fancy-badge{background:linear-gradient(180deg,rgba(30,41,59,.6),rgba(15,23,42,.4))}
+  .btn-grad{
+    background:linear-gradient(135deg,#1d4ed8 0%,#0ea5e9 100%);
+    color:#fff; box-shadow:0 10px 24px rgba(2,6,23,.18);
+  }
+  .btn-grad:hover{transform:translateY(-1px); box-shadow:0 14px 28px rgba(2,6,23,.22)}
+  .content-text{line-height:1.75;letter-spacing:.01em}
+  /* keep single line */
+  .nowrap{white-space:nowrap;overflow-x:auto;max-width:none}
+  </style>
+</head>
+<body class="bg-base-100 font-body">
+  <!-- NAV -->
+  <header class="sticky top-0 z-50 transition-shadow">
+    <nav class="nav-blur border-b border-base-200/60">
+      <div class="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
+        <a class="flex items-center gap-3 text-primary font-heading font-bold text-xl cursor-pointer" onclick="navigateTo(&apos;home&apos;)">
+          <span class="iconify text-accent" data-icon="heroicons:brain" data-width="26"></span>
+          ADHD Assessment Assistant
+        </a>
+        <ul class="hidden md:flex items-center gap-8 text-sm">
+          <li><a class="nav-item" onclick="navigateTo(&apos;about_adhd&apos;)">About ADHD</a></li>
+          <li><a class="nav-item" onclick="navigateTo(&apos;questionnaire_intro&apos;)">Start Assessment</a></li>
+          <li><a class="nav-item" onclick="navigateTo(&apos;privacy_policy&apos;)">Privacy Policy</a></li>
+          <li><a class="nav-item" onclick="navigateTo(&apos;contact_us&apos;)">Contact Us</a></li>
+        </ul>
+        <div class="flex items-center gap-2">
+          <button class="btn btn-ghost btn-circle" title="Help" onclick="navigateTo(&apos;contact_us&apos;)">
+            <span class="iconify" data-icon="heroicons:question-mark-circle" data-width="22"></span>
+          </button>
+          <button class="btn btn-ghost btn-circle md:hidden" onclick="toggleMobileMenu()">
+            <span class="iconify" data-icon="heroicons:bars-3" data-width="22"></span>
+          </button>
+        </div>
+      </div>
+      <!-- mobile -->
+      <div class="md:hidden hidden" data-mobile-menu>
+        <div class="px-6 pb-3 space-y-2">
+          <a class="block py-2" onclick="navigateTo(&apos;about_adhd&apos;)">About ADHD</a>
+          <a class="block py-2" onclick="navigateTo(&apos;questionnaire_intro&apos;)">Start Assessment</a>
+          <a class="block py-2" onclick="navigateTo(&apos;privacy_policy&apos;)">Privacy Policy</a>
+          <a class="block py-2" onclick="navigateTo(&apos;contact_us&apos;)">Contact Us</a>
+        </div>
+      </div>
+    </nav>
+    <div class="fancy-divider"></div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero-bg relative overflow-hidden">
+    <!-- decorative blobs -->
+    <div class="pointer-events-none absolute -top-24 -left-24 w-[28rem] h-[28rem] rounded-full bg-blue-400/10 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-24 -right-24 w-[32rem] h-[32rem] rounded-full bg-indigo-400/10 blur-3xl"></div>
+
+    <div class="max-w-[1600px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+      <div class="text-center mx-auto">
+        <!-- Badge strip -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full fancy-badge text-xs text-base-content/70 mb-6">
+          <span class="iconify" data-icon="heroicons:shield-check" data-width="16"></span> Privacy-first
+          <span>•</span>
+          <span class="iconify" data-icon="heroicons:cpu-chip" data-width="16"></span> Local AI
+          <span>•</span>
+          <span class="iconify" data-icon="heroicons:academic-cap" data-width="16"></span> Professional Reference
+        </div>
+
+        <!-- Title (single line) -->
+        <h1 class="nowrap text-[2.6rem] sm:text-5xl lg:text-6xl font-heading font-semibold text-base-content leading-tight mx-auto">
+          Your Intelligent <span class="bg-clip-text text-transparent" style="background-image:linear-gradient(90deg,#1d4ed8 0%,#0ea5e9 100%)">ADHD Assessment Assistant</span>
+        </h1>
+
+        <!-- Features inline -->
+        <div class="nowrap mt-6 flex flex-nowrap justify-center items-center gap-5 text-base text-base-content/80">
+          <span class="inline-flex items-center gap-2"><span class="iconify text-accent" data-icon="heroicons:shield-check" data-width="18"></span>Privacy Computing</span>
+          <span>·</span>
+          <span class="inline-flex items-center gap-2"><span class="iconify text-accent" data-icon="heroicons:cpu-chip" data-width="18"></span>Local Assessment</span>
+          <span>·</span>
+          <span class="inline-flex items-center gap-2"><span class="iconify text-accent" data-icon="heroicons:academic-cap" data-width="18"></span>Professional Reference</span>
+        </div>
+
+        <!-- Description (single line glass card) -->
+        <div class="mt-8 mx-auto inline-block glass rounded-xl px-6 py-4">
+          <p class="nowrap text-base sm:text-lg text-base-content/70 content-text">
+            Providing convenient ADHD self-assessment services using local AI models to ensure data privacy, with scientific and objective assessment references.
+          </p>
+        </div>
+
+        <!-- CTA -->
+        <div class="mt-10 flex flex-nowrap justify-center items-center gap-4 nowrap">
+          <button class="btn btn-lg btn-grad px-7 py-3 rounded-xl btn-medical" onclick="navigateTo(&apos;questionnaire_intro&apos;)">
+            <span class="iconify" data-icon="heroicons:play" data-width="22"></span>
+            <span class="ml-2">Start Assessment</span>
+          </button>
+          <button class="btn btn-lg btn-ghost px-7 py-3 rounded-xl border border-base-300" onclick="navigateTo(&apos;about_adhd&apos;)">
+            <span class="iconify" data-icon="heroicons:information-circle" data-width="22"></span>
+            <span class="ml-2">About ADHD</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="relative py-20 lg:py-24">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10">
+      <div class="text-center mb-14">
+        <h2 class="text-3xl lg:text-4xl font-heading font-semibold">Why Choose Us?</h2>
+        <p class="text-base lg:text-lg text-base-content/70 mt-3">Focused on your privacy, accuracy, and convenience</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <article class="glass rounded-2xl p-8 hover:translate-y-[-4px] transition-all duration-200">
+          <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+            <span class="iconify text-primary" data-icon="heroicons:shield-check" data-width="28"></span>
+          </div>
+          <h3 class="text-xl font-heading mb-2">Privacy Computing</h3>
+          <p class="text-base-content/70 content-text">All assessment data is processed fully on-device and never uploaded to the cloud.</p>
+        </article>
+
+        <article class="glass rounded-2xl p-8 hover:translate-y-[-4px] transition-all duration-200">
+          <div class="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center mb-5">
+            <span class="iconify text-accent" data-icon="heroicons:cpu-chip" data-width="28"></span>
+          </div>
+          <h3 class="text-xl font-heading mb-2">AI-Assisted Assessment</h3>
+          <p class="text-base-content/70 content-text">Advanced local models provide multi-dimensional references with better objectivity.</p>
+        </article>
+
+        <article class="glass rounded-2xl p-8 hover:translate-y-[-4px] transition-all duration-200">
+          <div class="w-14 h-14 rounded-xl bg-secondary/10 flex items-center justify-center mb-5">
+            <span class="iconify text-secondary" data-icon="heroicons:academic-cap" data-width="28"></span>
+          </div>
+          <h3 class="text-xl font-heading mb-2">Professional &amp; Convenient</h3>
+          <p class="text-base-content/70 content-text">Flows designed around guidelines, with clear questionnaires and result interpretation.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCLAIMER -->
+  <section class="py-16 bg-warning/5 border-t border-warning/20">
+    <div class="max-w-5xl mx-auto px-6 lg:px-10 text-center">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-warning/20 flex items-center justify-center mb-5">
+        <span class="iconify text-warning" data-icon="heroicons:exclamation-triangle" data-width="30"></span>
+      </div>
+      <h3 class="text-2xl font-heading mb-6">Important Notice: Non-Medical Diagnostic Tool</h3>
+
+      <p class="text-base lg:text-lg text-base-content/80 content-text mb-4">
+        This assistant provides auxiliary reference and personal health management information.
+      </p>
+      <p class="text-base lg:text-lg text-base-content/80 content-text">
+        It does not replace professional diagnosis, treatment, or consultation. Please seek medical advice if needed.
+      </p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-base-200">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
+      <aside>
+        <div class="flex items-center gap-3 mb-4">
+          <span class="iconify text-accent" data-icon="heroicons:brain" data-width="28"></span>
+          <span class="text-xl font-heading font-bold">ADHD Assessment Assistant</span>
+        </div>
+        <p class="text-sm text-base-content/70 content-text">
+          Local, privacy-first ADHD assessment assistant providing professional references.
+        </p>
+      </aside>
+
+      <nav>
+        <h4 class="text-base font-heading mb-3 text-primary">Main Features</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a class="link link-hover" onclick="navigateTo(&apos;about_adhd&apos;)">ADHD Knowledge</a></li>
+          <li><a class="link link-hover" onclick="navigateTo(&apos;questionnaire_intro&apos;)">Online Questionnaire</a></li>
+          <li><a class="link link-hover" onclick="navigateTo(&apos;file_upload&apos;)">File Upload</a></li>
+          <li><a class="link link-hover" onclick="navigateTo(&apos;diagnostic_results&apos;)">View Results</a></li>
+        </ul>
+      </nav>
+
+      <nav>
+        <h4 class="text-base font-heading mb-3 text-primary">Support</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a class="link link-hover" onclick="navigateTo(&apos;privacy_policy&apos;)">Privacy Policy</a></li>
+          <li><a class="link link-hover" onclick="navigateTo(&apos;contact_us&apos;)">Contact Us</a></li>
+          <li><span class="opacity-70">FAQ</span></li>
+        </ul>
+      </nav>
+
+      <nav>
+        <h4 class="text-base font-heading mb-3 text-primary">Data Security</h4>
+        <ul class="space-y-2 text-sm">
+          <li class="flex items-center gap-2"><span class="iconify text-success" data-icon="heroicons:shield-check" data-width="16"></span>Local Processing</li>
+          <li class="flex items-center gap-2"><span class="iconify text-success" data-icon="heroicons:lock-closed" data-width="16"></span>No Cloud Upload</li>
+          <li class="flex items-center gap-2"><span class="iconify text-success" data-icon="heroicons:eye-slash" data-width="16"></span>Privacy Protection</li>
+          <li class="flex items-center gap-2"><span class="iconify text-info" data-icon="heroicons:cpu-chip" data-width="16"></span>AI On-Device</li>
+        </ul>
+      </nav>
+    </div>
+    <div class="border-t border-base-300">
+      <div class="max-w-7xl mx-auto px-6 lg:px-10 py-6 text-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p>© 2025 ADHD Assessment Assistant. All rights reserved.</p>
+        <div class="flex items-center gap-5">
+          <a class="link link-hover" onclick="navigateTo(&apos;privacy_policy&apos;)">Privacy Policy</a>
+          <a class="link link-hover" onclick="navigateTo(&apos;contact_us&apos;)">Technical Support</a>
+          <span class="inline-flex items-center gap-1 text-success"><span class="iconify" data-icon="heroicons:shield-check" data-width="16"></span>Secure &amp; Trusted</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ===== Page interactions =====
+    window.navigateTo = id => (self!==top) ? parent.postMessage({type:"iframeNavigation",targetPageId:id},"*") : (location.href = id+".html");
+    window.toggleMobileMenu = () => { const m=document.querySelector("[data-mobile-menu]"); if(m) m.classList.toggle("hidden") };
+
+    // Add shadow on scroll
+    (()=>{ let last=0; const wrap=document.querySelector("header"); addEventListener("scroll",()=>{ const y=scrollY||document.documentElement.scrollTop; wrap.style.boxShadow = y>8 ? "0 10px 30px rgba(2,6,23,.08)" : "none"; last=y; }) })();
+
+    // Button micro feedback
+    document.addEventListener("DOMContentLoaded",()=>{
+      document.querySelectorAll("button[onclick*=\"navigateTo\"]").forEach(b=>{
+        b.addEventListener("click",function(){
+          const html=this.innerHTML; this.innerHTML = \'<span class="loading loading-spinner loading-sm"></span> Loading...\'; this.disabled=true;
+          setTimeout(()=>{this.innerHTML=html; this.disabled=false},1200);
+        })
+      })
+    })
+  </script>
+</body>
+</html>
+      '></iframe>
+    </div>
+  </div>
+</body>
+</html>
